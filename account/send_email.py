@@ -14,10 +14,10 @@ def send_confirmation_email(email, code):
         'Здравствуйте, активируйте ваш аккаунт! '
         'Чтобы активировать ваш аккаунт, перейдите по ссылке:'
         '<br>'
-        '<a href="{activation_url}">{activation_url}</a>'
+        '<a href="{}"></a>'
         '<br>'
         'Не передавайте этот код никому!',
-        activation_url, activation_url
+        activation_url,
     )
 
     send_mail(
