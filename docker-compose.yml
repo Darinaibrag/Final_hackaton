@@ -47,7 +47,7 @@ services:
 
   celery:
     build: .
-    command: celery -A shopAPI worker -l INFO
+    command: celery -A config worker -l INFO
     volumes:
       - .:/usr/src/app/
     depends_on:
