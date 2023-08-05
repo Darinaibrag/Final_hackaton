@@ -215,3 +215,8 @@ LOGGING = {
         }
     }
 }
+
+CORS_ALLOWED_ORIGINS = [
+    'http://localhost:3000',
+    # Add any other allowed origins here if needed
+]
