@@ -15,8 +15,40 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path
+from django.urls import path, include
+from drf_yasg.views import get_schema_view
+from drf_yasg import openapi
+from rest_framework import permissions
+from rest_framework.routers import DefaultRouter
+from django.conf.urls.static import static
+from django.conf import settings
+
+
+schema_view = get_schema_view(
+    openapi.Info(
+        title="py29 API",
+        default_version='v1',
+        description="Kyrgyz voyage",
+        terms_of_service="https://www.google.com/policies/terms/",
+        contact=openapi.Contact(email="contact@snippets.local"),
+        license=openapi.License(name="BSD License"),
+   ),
+    public=True,
+    permission_classes= [permissions.AllowAny,]
+
+)
+
+# router = DefaultRouter()
+# router.register('categories', CategoryViewSet)
+# router.register('products', ProductViewSet)
 
 urlpatterns = [
     path("admin/", admin.site.urls),
+    path('docs/', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
+    path("api/account/", include('account.urls')),
+
+    # path('api/', include(router.urls)),
 ]
+
+urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
