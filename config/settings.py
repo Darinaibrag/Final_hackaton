@@ -51,6 +51,10 @@ INSTALLED_APPS = [
     # APPS
     'account',
     'payment',
+    'category',
+    'post',
+    'comment',
+    'like',
 ]
 
 MIDDLEWARE = [
