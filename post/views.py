@@ -10,11 +10,22 @@ from rest_framework.viewsets import ModelViewSet
 from rest_framework.decorators import action
 from like.serializers import LikedUserSerializer, FavoritesPostsSerializer
 from rest_framework.response import Response
+from rest_framework.pagination import PageNumberPagination
+from rest_framework.filters import SearchFilter
+from django_filters.rest_framework import DjangoFilterBackend
 # Create your views here.
+
+class StandartResultPagination(PageNumberPagination):
+    page_size = 10
+    page_query_param = 'page'
 
 
 class PostViewSet(ModelViewSet):
     queryset = Post.objects.all()
+    pagination_class = StandartResultPagination
+    filter_backends = (SearchFilter, DjangoFilterBackend)
+    search_fields = ('title',)
+    filterset_fields = ('title', 'category')
     permission_classes = [permissions.IsAuthenticated]
 
     def get_serializer_class(self):

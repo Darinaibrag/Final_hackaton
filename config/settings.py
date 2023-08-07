@@ -47,6 +47,7 @@ INSTALLED_APPS = [
     "ckeditor",
     'drf_api_logger',
     "corsheaders",
+    "django_filters",
 
     # APPS
     'account',
