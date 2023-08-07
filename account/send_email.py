@@ -9,15 +9,15 @@ twilio_sender = settings.TWILIO_SENDER_PHONE
 
 
 def send_confirmation_email(email, code):
-    activation_url = f'http://127.0.0.1:8000/api/account/activate/?u={code}'
+    activation_url = f'http://localhost:3000/api/account/activate/?u={code}'
     message = format_html(
         'Здравствуйте, активируйте ваш аккаунт! '
         'Чтобы активировать ваш аккаунт, перейдите по ссылке:'
         '<br>'
-        '<a href="{}">{}</a>'
+        '<a href="{}"></a>'
         '<br>'
         'Не передавайте этот код никому!',
-        activation_url, activation_url
+        activation_url,
     )
 
     send_mail(
