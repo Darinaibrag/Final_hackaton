@@ -83,3 +83,21 @@ class RegistrationPhoneSerializer(serializers.ModelSerializer):
         send_activation_sms_task.delay(user.phone_number, user.activation_code)
         return user
 
+
+class ResetPasswordSerializer(serializers.Serializer):
+    email = serializers.EmailField()
+    new_password = serializers.CharField(min_length=6, max_length=20, required=True, write_only=True)
+    password_confirmation = serializers.CharField(min_length=6, max_length=20, required=True, write_only=True)
+
+    def validate(self, attrs):
+        password = attrs['new_password']
+        password_confirmation = attrs.pop('password_confirmation')
+        if password != password_confirmation:
+            raise serializers.ValidationError(
+                'Passwords must be the same'
+            )
+        if password.isdigit() or password.isalpha():
+            raise serializers.ValidationError(
+                'The password must contain letters and numbers'
+            )
+        return attrs

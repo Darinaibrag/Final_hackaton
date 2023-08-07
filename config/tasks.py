@@ -1,4 +1,4 @@
-from account.send_email import send_confirmation_email, send_activation_sms
+from account.send_email import send_confirmation_email, send_activation_sms, send_confirmation_password
 
 from .celery import app
 
@@ -9,3 +9,7 @@ def send_connfirmation_email_task(email, code):
 @app.task()
 def send_activation_sms_task(phone_number, activation_code):
     send_activation_sms(phone_number, activation_code)
+
+@app.task()
+def send_confirmation_password_task(email, code):
+    send_confirmation_password(email, code)
