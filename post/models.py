@@ -16,6 +16,7 @@ class Post(models.Model):
     preview = models.ImageField(upload_to='images/', null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+    availability = models.CharField(choices=STATUS_CHOICES, max_length=50, default='Available')
     price = models.DecimalField(max_digits=6, decimal_places=2, null=True)
 
     def __str__(self):
