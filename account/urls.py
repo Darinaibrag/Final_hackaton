@@ -1,6 +1,6 @@
 from django.urls import path
 from .views import RegistrationView, ActivationView, LoginView, UserListView, LogoutView, RegistrationPhoneView, \
-    ResetPasswordConfirmView, ResetPasswordView
+    ResetPasswordConfirmView, ResetPasswordView, UserProfileVIEW
 from rest_framework_simplejwt.views import TokenRefreshView
 
 urlpatterns = [
@@ -13,4 +13,5 @@ urlpatterns = [
     path('register_phone/', RegistrationPhoneView.as_view()),
     path('reset-password/', ResetPasswordView.as_view()),
     path('reset-password/confirm/<str:activation_code>/', ResetPasswordConfirmView.as_view()),
+    path('profile/', UserProfileVIEW.as_view()),
 ]
