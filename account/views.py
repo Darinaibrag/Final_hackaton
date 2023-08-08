@@ -114,3 +114,14 @@ class ResetPasswordConfirmView(APIView):
             user.save()
             return Response('Ваш пароль успешно обновлен', status=200)
         return Response(serializer.errors, status=400)
+
+class UserProfileVIEW(GenericAPIView):
+    serializer_class = UserSerializer
+    permission_classes = (permissions.AllowAny,)
+
+    def get(self, request):
+        user = request.user
+        profile = get_object_or_404(User, email=user.email)
+        serializer = UserSerializer(instance=profile)
+        return Response(serializer.data, status=200)
+

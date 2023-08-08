@@ -48,6 +48,7 @@ INSTALLED_APPS = [
     'drf_api_logger',
     "corsheaders",
     "django_filters",
+    'django_extensions',
 
     # APPS
     'account',
