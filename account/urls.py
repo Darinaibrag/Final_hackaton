@@ -12,6 +12,6 @@ urlpatterns = [
     path('logout/', LogoutView.as_view()),
     path('register_phone/', RegistrationPhoneView.as_view()),
     path('reset-password/', ResetPasswordView.as_view()),
-    path('reset-password/confirm/<str:activation_code>/', ResetPasswordConfirmView.as_view()),
+    path('reset-password/confirm/', ResetPasswordConfirmView.as_view()),
     path('profile/', UserProfileVIEW.as_view()),
 ]

@@ -54,6 +54,15 @@ services:
       - web
       - redis
 
+  celery-beat:
+    build: .
+    command: celery -A config beat -l INFO
+    volumes:
+      - .:/usr/src/app/
+    depends_on:
+      - web
+      - redis
+
   nginx:
      build:
        context: .
