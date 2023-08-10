@@ -3,6 +3,7 @@ from rest_framework import generics, permissions
 from comment.serializers import CommentSerializer
 from like.models import Favorites, Like
 from comment.models import Comment
+from rating.serializers import RatingSerializer
 from .models import Post
 from .permissions import IsAuthorOrAdmin, IsAuthor
 from .serializers import PostCreateSerializer, PostListSerializers, PostDetailSerializer
@@ -13,6 +14,8 @@ from rest_framework.response import Response
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.filters import SearchFilter
 from django_filters.rest_framework import DjangoFilterBackend
+
+
 # Create your views here.
 
 class StandartResultPagination(PageNumberPagination):
@@ -100,3 +103,27 @@ class PostViewSet(ModelViewSet):
             favorites = post.favorites.all()
             serializer = FavoritesPostsSerializer(instance=favorites, many=True)
             return Response(serializer.data, status=200)
+
+    @action(['GET', 'POST', 'DELETE'], detail=True)
+    def ratings(self, request, pk):
+        post = self.get_object()
+        user = request.user
+
+        if request.method == 'GET':
+            rating = post.ratings.all()
+            serializer = RatingSerializer(instance=rating, many=True)
+            return Response(serializer.data, status=200)
+
+        elif request.method == 'POST':
+            if post.ratings.filter(owner=user).exists():
+                return Response('You have already rated this post', status=400)
+            serializer = RatingSerializer(data=request.data)
+            serializer.is_valid(raise_exception=True)
+            serializer.save(owner=user, post=post)
+            return Response(serializer.data, status=201)
+        else:
+            if not post.ratings.filter(owner=user).exists():
+                return Response('You cannot delete because you have not rated this post.', status=400)
+            rating = post.ratings.get(owner=user)
+            rating.delete()
+            return Response('Deleted', status=204)
