@@ -27,7 +27,7 @@ def send_confirmation_email(email, code):
     )
 
 def send_confirmation_password(email, code):
-    activation_url = f'http://localhost:3000/api/account/reset-password/confirm/{code}/'
+    activation_url = f'http://localhost:3000/api/account/reset-password/confirm/?u={code}'
     context = {'activation_url': activation_url}
     subject = 'Hello, please confirm the new password.'
     html_message = render_to_string('new_password.html', context)
