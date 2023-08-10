@@ -32,9 +32,9 @@ class UserManager(BaseUserManager):
         kwargs.setdefault('is_superuser', True)
         kwargs.setdefault('is_active', True)
         if kwargs.get('is_staff') is not True:
-            raise ValueError('У суперюзера должно быть поле is_staff=True')
+            raise ValueError('The superuser should have the field is_staff=True.')
         if kwargs.get('is_superuser') is not True:
-            raise ValueError('У супер юзера должно быьб поле is_superuser=True')
+            raise ValueError('The superuser should have the field is_superuser=True.')
         return self._create_user(email, password, **kwargs)
 
 

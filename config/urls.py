@@ -49,7 +49,8 @@ urlpatterns = [
     path('category/', include('category.urls')),
     path('post/', include('post.urls')),
     path('like/', include('like.urls')),
-    path('comment/', include('comment.urls'))
+    path('comment/', include('comment.urls')),
+    path('booking/', include('booking.urls'))
 
     # path('api/', include(router.urls)),
 ]

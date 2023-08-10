@@ -13,7 +13,7 @@ twilio_sender = settings.TWILIO_SENDER_PHONE
 def send_confirmation_email(email, code):
     activation_url = f'http://localhost:3000/api/account/activate/?u={code}'
     context = {'activation_url': activation_url}
-    subject = 'Здравствуйте, подтвердите почту'
+    subject = 'Hello, please confirm your email.'
     html_message = render_to_string('email_activate.html', context)
     plain_message = strip_tags(html_message)
 
@@ -29,7 +29,7 @@ def send_confirmation_email(email, code):
 def send_confirmation_password(email, code):
     activation_url = f'http://localhost:3000/api/account/reset-password/confirm/?u={code}'
     context = {'activation_url': activation_url}
-    subject = 'Здравствуйте, подтвердите новый пароль'
+    subject = 'Hello, please confirm the new password.'
     html_message = render_to_string('new_password.html', context)
     plain_message = strip_tags(html_message)
 
@@ -43,6 +43,6 @@ def send_confirmation_password(email, code):
     )
 
 def send_activation_sms(phone_number, activation_code):
-    message = f'Ваш код активации: {activation_code}'
+    message = f'Your activation code: {activation_code}'
     client = Client(account_sid, auth_token)
     client.messages.create(body=message, from_=twilio_sender, to=phone_number)
