@@ -1,10 +1,11 @@
-version: '3.3'
+version: '2'
 
 services:
   web:
     build: .
     command: >
       sh -c "gunicorn config.wsgi:application --bind 0.0.0.0:8000"
+    container_name: app_django
     volumes:
       - .:/usr/src/app/
       - static_volume:/usr/src/app/static
@@ -16,6 +17,12 @@ services:
       - db
       - redis
       - migration
+    env_file:
+      - .env
+    environment:
+      - VIRTUAL_HOST=app.kayakta.pp.ua
+      - LETSENCRYPT_HOST=app.kayakta.pp.ua
+
 
   db:
     image: postgres
@@ -62,6 +69,10 @@ services:
     depends_on:
       - web
       - redis
+    environment:
+      - VIRTUAL_HOST=app.kayakta.pp.ua
+      - LETSENCRYPT_HOST=app.kayakta.pp.ua
+
 
   nginx:
      build:
@@ -69,13 +80,38 @@ services:
        dockerfile: nginx/Dockerfile
      ports:
        - "80:80"
+       - "443:443"
      volumes:
        - static_volume:/usr/src/app/static
        - media_volume:/usr/src/app/media
+       - certs:/etc/nginx/certs
+       - vhost:/etc/nginx/vhost.d
+       - html:/usr/share/nginx/html
+       - /var/run/docker.sock:/tmp/docker.sock:ro
      depends_on:
        - web
+
+  acme_companion:
+    image: nginxproxy/acme-companion:2.2
+    container_name: acme_companion
+    volumes_from:
+      - nginx
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - acme:/etc/acme.sh
+
+  watchtower:
+    image: containrrr/watchtower
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    command: --interval 30 app_django
+
 
 volumes:
   postgres_data:
   static_volume:
   media_volume:
+  certs:
+  vhost:
+  html:
+  acme:

@@ -1,6 +1,6 @@
-# broker_url = 'redis://redis:6379/'
+# broker_url = 'redis://redis:6379/' 127.0.0.1
 # result_backend = 'redis://redis:6379/'
-REDIS_HOST = '127.0.0.1'
+REDIS_HOST = 'redis'
 REDIS_PORT = '6379'
 
 broker_url = 'redis://' + REDIS_HOST + ':' + REDIS_PORT + '/0'
