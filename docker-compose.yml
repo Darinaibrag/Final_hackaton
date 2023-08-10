@@ -20,8 +20,8 @@ services:
     env_file:
       - .env
     environment:
-      - VIRTUAL_HOST=${ALLOWED_HOST}
-      - LETSENCRYPT_HOST=${ALLOWED_HOST}
+      - VIRTUAL_HOST=app.kayakta.pp.ua
+      - LETSENCRYPT_HOST=app.kayakta.pp.ua
 
 
   db:
@@ -70,8 +70,8 @@ services:
       - web
       - redis
     environment:
-      - VIRTUAL_HOST=${ALLOWED_HOST}
-      - LETSENCRYPT_HOST=${ALLOWED_HOST}
+      - VIRTUAL_HOST=app.kayakta.pp.ua
+      - LETSENCRYPT_HOST=app.kayakta.pp.ua
 
 
   nginx:
