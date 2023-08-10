@@ -77,7 +77,7 @@ def get_data(html):
         dates.append(post_data)
 
     for data in dates:
-        category_name = 'Туризм'  # Название категории
+        category_name = 'Tourism'  # Название категории
         category = Category.objects.get(name=category_name)
         for i in data:
             try:

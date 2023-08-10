@@ -57,6 +57,7 @@ INSTALLED_APPS = [
     'post',
     'comment',
     'like',
+    'booking',
 ]
 
 MIDDLEWARE = [
