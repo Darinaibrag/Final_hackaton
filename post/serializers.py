@@ -3,6 +3,7 @@ from comment.serializers import CommentSerializer
 from .models import Post, PostImages
 from category.models import Category
 from like.serializers import LikeSerializer
+from django.db.models import Avg
 
 
 class PostImageSerializer(serializers.ModelSerializer):
@@ -66,4 +67,22 @@ class PostDetailSerializer(serializers.ModelSerializer):
         if user.is_authenticated:
             representation['is_liked'] = self.is_liked(instance, user)
             representation['is_favorite'] = self.is_favorite(instance, user)
+        return representation
+
+
+class PostSerializer(serializers.ModelSerializer):
+    owner_email = serializers.ReadOnlyField(source='owner.email')
+    owner = serializers.ReadOnlyField(source='owner.id')
+
+    class Meta:
+        model = Post
+        fields = '__all__'
+
+    def to_representation(self, instance):
+        representation = super().to_representation(instance)
+        representation['rating'] = instance.ratings.aggregate(
+            Avg('rating')
+        )
+        rating = representation['rating']
+        rating['rating_count'] = instance.ratings.count()
         return representation
