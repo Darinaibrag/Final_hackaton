@@ -45,50 +45,47 @@ def get_html(url):
     print(response.status_code)
     return response.text
 
-
 def get_data(html):
     soup = BeautifulSoup(html, 'lxml')
     dates = []
-    list_cat = soup.find_all('div', class_='BqDzz z')
+    list_cat = soup.find_all('div', class_='NXAUb _T')
     for cat in list_cat:
-        link = 'https://www.tripadvisor.com' + cat.find('div', class_='alPVI eNNhq PgLKC tnGGX').find('a').get('href')
+        link = 'https://www.tripadvisor.com' + cat.find('div', class_='jsTLT K').find('a').get('href')
         print(link)
         sop = BeautifulSoup(get_html(link), 'lxml')
         post_data = []
-        preview = sop.find('div', class_='Skses z vECdA').find('div', class_='_T').find('img').get('src')
-        image_elements = sop.find('div', class_='Skses z vECdA').find('div', class_='_T').find_all('button')
+        image_elements = sop.find('div', class_='dFaUm carousel').find('ul', class_='LgMtS').find_all('li')
         img_urls = []
         for img_element in image_elements:
-            img_tag = img_element.find('img')
+            img_tag = img_element.find('picture')
             if img_tag:
-                img_url = img_tag.get('src')
+                img_url = img_tag.find('img').get('src')
                 img_urls.append(img_url)
-        title = sop.find('div', class_='qyzqH f k w').find('h1').text
+        preview = img_urls[0]
+        title = sop.find('div', class_='f u').find('h1').text
+        description = sop.find('div', class_='fIrGe _T').text
         try:
-            description = sop.find('div', class_='_d').text
+            price = sop.find('div', class_='XQgaU').find('div', class_='fOGdO f').find('div', class_='gbXAQ').text
+            float_value = float(''.join([i for i in price if i.isdigit()]))
         except:
-            description = ''
-        price = sop.find('div', class_='biGQs _P fiohW avBIb uuBRH').text
-        float_value = float(''.join([i for i in price if i.isdigit()]))
+            float_value = None
         post_data.append({'title': title, 'description': description, 'price': float_value, 'preview': preview,
                           'image_urls': img_urls})
         print(post_data)
-        time.sleep(1)
         dates.append(post_data)
 
     for data in dates:
-        category_name = 'Tourism'  # Название категории
+        category_name = 'Hotels'  # Название категории
         category = Category.objects.get(name=category_name)
         for i in data:
             try:
-                headers = {
-                    'user-agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 YaBrowser/23.7.0.2564 Yowser/2.5 Safari/537.36'}
+                headers = {'user-agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 YaBrowser/23.7.0.2564 Yowser/2.5 Safari/537.36'}
                 preview_response = requests.get(i['preview'], headers=headers)
                 preview_name = generate_unique_image_name()
                 prw_io = BytesIO(preview_response.content)
                 post = Post.objects.create(title=i['title'], body=i['description'], price=i['price'],
                                            category=category, owner=User.objects.first(), preview=None)
-                if prw_io:
+                if preview_name and prw_io:
                     post.preview.save(preview_name, File(prw_io))
                 for image_url in i['image_urls']:
                     image_response = requests.get(image_url, headers=headers)
@@ -105,7 +102,7 @@ def run():
     for i in range(3):
         count = i * 30
         suffix = f"-o{count}" if count > 0 else ""
-        new_url = f'https://www.tripadvisor.com/Attraction_Products-g293948-t12035-zfg12022{suffix}-Bishkek.html'
+        new_url = f'https://www.tripadvisor.com/Hotels-g293948-oa{suffix}-a_trating.40-a_ufe.true-Bishkek-Hotels.html'
         print(new_url)
         get_data(get_html(new_url))
 
