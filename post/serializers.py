@@ -67,6 +67,11 @@ class PostDetailSerializer(serializers.ModelSerializer):
         if user.is_authenticated:
             representation['is_liked'] = self.is_liked(instance, user)
             representation['is_favorite'] = self.is_favorite(instance, user)
+        representation['rating'] = instance.ratings.aggregate(
+            Avg('rating')
+        )
+        rating = representation
+        rating['rating_count'] = instance.ratings.count()
         return representation
 
 
