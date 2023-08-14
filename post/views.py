@@ -28,7 +28,7 @@ class PostViewSet(ModelViewSet):
     pagination_class = StandartResultPagination
     filter_backends = (SearchFilter, DjangoFilterBackend)
     search_fields = ('title',)
-    filterset_fields = ('title', 'category')
+    filterset_fields = ('title', 'category', 'category__name')
     permission_classes = [permissions.IsAuthenticated]
 
     def get_serializer_class(self):
