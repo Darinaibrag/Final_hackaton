@@ -106,6 +106,15 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
     command: --interval 30 app_django
 
+  bot:
+    build: .
+    command: python manage.py bot
+    volumes:
+      - .:/usr/src/app/
+    depends_on:
+      - web
+      - redis
+
 
 volumes:
   postgres_data:
