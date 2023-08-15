@@ -1,12 +1,15 @@
+from django.db.models import Avg
 from django.shortcuts import render
 from rest_framework import generics, permissions
+from rest_framework.views import APIView
+import random
 from comment.serializers import CommentSerializer
 from like.models import Favorites, Like
 from comment.models import Comment
 from rating.serializers import RatingSerializer
 from .models import Post
 from .permissions import IsAuthorOrAdmin, IsAuthor
-from .serializers import PostCreateSerializer, PostListSerializers, PostDetailSerializer
+from .serializers import PostCreateSerializer, PostListSerializers, PostDetailSerializer, PostSerializer
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.decorators import action
 from like.serializers import LikedUserSerializer, FavoritesPostsSerializer
@@ -14,7 +17,9 @@ from rest_framework.response import Response
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.filters import SearchFilter
 from django_filters.rest_framework import DjangoFilterBackend
-
+from django.db.models import Avg, Value
+from django.db.models.functions import Coalesce
+from django.db.models.fields import FloatField
 
 # Create your views here.
 
@@ -127,3 +132,70 @@ class PostViewSet(ModelViewSet):
             rating = post.ratings.get(owner=user)
             rating.delete()
             return Response('Deleted', status=204)
+
+
+
+
+class CustomPageNumberPagination(PageNumberPagination):
+    page_size = 1
+    page_size_query_param = 'page_size'
+    max_page_size = 10
+
+class TourBotNextPostView(APIView):
+    pagination_class = CustomPageNumberPagination
+
+    def get(self, request):
+        category_id = 2  # Здесь задайте ID вашей категории
+
+        queryset = Post.objects.annotate(
+            avg_rating=Coalesce(Avg('ratings__rating', output_field=FloatField()), Value(0.0))
+        ).filter(
+            category=category_id
+        ).order_by('-avg_rating')
+
+        paginator = self.pagination_class()
+        page = paginator.paginate_queryset(queryset, request)
+
+        if page:
+            serializer = PostSerializer(page[0], many=False)
+            return paginator.get_paginated_response(serializer.data)
+
+        return Response('No posts found', status=404)
+
+class HotelBotNextPostView(APIView):
+    pagination_class = CustomPageNumberPagination
+
+    def get(self, request):
+        category_id = 1  # Здесь задайте ID вашей категории
+
+        queryset = Post.objects.annotate(
+            avg_rating=Coalesce(Avg('ratings__rating', output_field=FloatField()), Value(0.0))
+        ).filter(
+            category=category_id
+        ).order_by('-avg_rating')
+
+        paginator = self.pagination_class()
+        page = paginator.paginate_queryset(queryset, request)
+
+        if page:
+            serializer = PostSerializer(page[0], many=False)
+            return paginator.get_paginated_response(serializer.data)
+
+        return Response('No posts found', status=404)
+
+
+
+class TourBotRandomView(APIView):
+    def get(self, *args, **kwargs):
+        queryset = Post.objects.filter(category=2)
+        random_post = random.choice(queryset)
+        serializer = PostSerializer(random_post, many=False)
+        return Response(serializer.data, status=200)
+
+class HotelBotRandomView(APIView):
+    def get(self, *args, **kwargs):
+        queryset = Post.objects.filter(category=1)
+        random_post = random.choice(queryset)
+        serializer = PostSerializer(random_post, many=False)
+        return Response(serializer.data, status=200)
+
