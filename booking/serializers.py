@@ -1,3 +1,4 @@
+from django.db.models import Sum, F
 from rest_framework import serializers
 from booking.models import Booking, BookingItem
 
@@ -14,10 +15,15 @@ class BookingSerializer(serializers.ModelSerializer):
     status = serializers.CharField(read_only=True)
     user = serializers.ReadOnlyField(source='user.email')
     posts = BookingItemSerializer(write_only=True, many=True)
+    total_price = serializers.SerializerMethodField()
+
+    def get_total_price(self, instance):
+        total_price = instance.items.aggregate(total_price=Sum(F('quantity') * F('post__price')))['total_price']
+        return total_price or 0
 
     class Meta:
         model = Booking
-        fields = '__all__'
+        exclude = ('post',)
 
     def create(self, validated_data):
         posts_data = validated_data.pop('posts')
