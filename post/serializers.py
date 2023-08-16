@@ -37,6 +37,23 @@ class PostCreateSerializer(serializers.ModelSerializer):
             PostImages.objects.create(image=image, post=post)
         return post
 
+    def update(self, instance, validated_data):
+        request = self.context.get('request')
+        images_data = request.FILES.getlist('images')
+
+        instance.title = validated_data.get('title', instance.title)
+        instance.body = validated_data.get('body', instance.body)
+        instance.category = validated_data.get('category', instance.category)
+        instance.preview = validated_data.get('preview', instance.preview)
+        instance.price = validated_data.get('price', instance.price)
+        instance.save()
+
+        instance.images.all().delete()
+        for image in images_data:
+            PostImages.objects.create(image=image, post=instance)
+
+        return instance
+
 
 class PostDetailSerializer(serializers.ModelSerializer):
     owner_username = serializers.ReadOnlyField(source='owner.username')
