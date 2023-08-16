@@ -3,13 +3,14 @@ from django.shortcuts import render
 from rest_framework import generics, permissions
 from rest_framework.views import APIView
 import random
-from comment.serializers import CommentSerializer
+from comment.serializers import CommentSerializer, CommentActionSerializer
 from like.models import Favorites, Like
 from comment.models import Comment
 from rating.serializers import RatingSerializer
-from .models import Post
+from .models import Post, PostImages
 from .permissions import IsAuthorOrAdmin, IsAuthor
-from .serializers import PostCreateSerializer, PostListSerializers, PostDetailSerializer, PostSerializer
+from .serializers import PostCreateSerializer, PostListSerializers, PostDetailSerializer, PostSerializer, \
+    PostImagesSerializer
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.decorators import action
 from like.serializers import LikedUserSerializer, FavoritesPostsSerializer
@@ -76,17 +77,18 @@ class PostViewSet(ModelViewSet):
         post = self.get_object()
         user = request.user
         if request.method == 'POST':
-            Comment.objects.create(owner=user, post=post)
-            return Response('Commented', status=201)
+            serializer = CommentActionSerializer(data=request.data, context={'post': post.id, 'owner': user})
+            serializer.is_valid(raise_exception=True)
+            serializer.save()
+            return Response(serializer.data)
         elif request.method == 'DELETE':
-            comment = Comment.objects.filter(owner=user, post=post)
-            if comment.exists():
-                comment.delete()
-                return Response('Comment deleted', status=204)
-            return Response('Post is not found', status=404)
+            comment_id = self.request.query_params['id']
+            comment = post.comments.filter(post=post, pk=comment_id)
+            comment.delete()
+            return Response('The comment is delete', status=204)
         else:
-            comment = post.comments.all()
-            serializer = CommentSerializer(instance=comment, many=True)
+            comments = post.comments.all()
+            serializer = CommentSerializer(instance=comments, many=True)
             return Response(serializer.data, status=200)
 
     @action(['GET', 'POST', 'DELETE'], detail=True)
@@ -199,3 +201,16 @@ class HotelBotRandomView(APIView):
         serializer = PostSerializer(random_post, many=False)
         return Response(serializer.data, status=200)
 
+
+class PostImagesViewSet(ModelViewSet):
+    queryset = PostImages.objects.all()
+    serializer_class = PostImagesSerializer
+    permission_classes = [permissions.IsAuthenticated, IsAuthorOrAdmin]
+
+    def perform_create(self, serializer):
+        serializer.save()
+
+    def get_queryset(self):
+        if self.request.user.is_superuser:
+            return PostImages.objects.all()
+        return PostImages.objects.filter(post__owner=self.request.user)

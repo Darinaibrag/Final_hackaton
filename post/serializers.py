@@ -92,3 +92,18 @@ class PostSerializer(serializers.ModelSerializer):
             'rating_count': rating_data['rating_count']
         }
         return representation
+
+class PostImagesSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = PostImages
+        fields = ('id', 'title', 'image', 'post')
+        read_only_fields = ('id', 'title', 'post')
+
+    def create(self, validated_data):
+        return PostImages.objects.create(**validated_data)
+
+    def update(self, instance, validated_data):
+        instance.title = validated_data.get('title', instance.title)
+        instance.image = validated_data.get('image', instance.image)
+        instance.save()
+        return instance
