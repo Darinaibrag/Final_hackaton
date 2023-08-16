@@ -135,7 +135,44 @@ class PostViewSet(ModelViewSet):
             rating.delete()
             return Response('Deleted', status=204)
 
+    @action(detail=True, methods=['GET', 'POST', 'PUT', 'DELETE'])
+    def images(self, request, pk=None):
+        post = self.get_object()
 
+        if request.method == 'GET':
+            images = post.images.all()
+            serializer = PostImagesSerializer(images, many=True)
+            return Response(serializer.data)
+
+        elif request.method == 'POST':
+            serializer = PostImagesSerializer(data=request.data)
+            if serializer.is_valid():
+                serializer.save(post=post)
+                return Response(serializer.data, status=201)
+            return Response(serializer.errors, status=400)
+
+        elif request.method == 'PUT':
+            image_id = request.data.get('id')
+            try:
+                image = post.images.get(pk=image_id)
+            except PostImages.DoesNotExist:
+                return Response({"error": "Image not found."}, status=404)
+
+            serializer = PostImagesSerializer(image, data=request.data, partial=True)
+            if serializer.is_valid():
+                serializer.save()
+                return Response(serializer.data)
+            return Response(serializer.errors, status=400)
+
+        elif request.method == 'DELETE':
+            image_id = request.data.get('id')
+            try:
+                image = post.images.get(pk=image_id)
+            except PostImages.DoesNotExist:
+                return Response({"error": "Image not found."}, status=404)
+
+            image.delete()
+            return Response(status=204)
 
 
 class CustomPageNumberPagination(PageNumberPagination):
