@@ -226,6 +226,11 @@ LOGGING = {
 }
 
 
+CORS_ALLOWED_ORIGINS = [
+    'http://localhost:3000',
+    # Add any other allowed origins here if needed
+]
+
 # CSRF_TRUSTED_ORIGINS = []
 # if scrf_subdomain := config("SCRF_SUBDOMAIN"):
 #     CSRF_TRUSTED_ORIGINS += [f'http://{scrf_subdomain}', f'https://{scrf_subdomain}']
